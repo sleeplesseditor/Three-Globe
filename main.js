@@ -9,7 +9,7 @@ import atmosphereFragmentShader from './shaders/atmosphereFragment.glsl';
 
 const canvasContainer = document.querySelector('#canvasContainer')
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(
+let camera = new THREE.PerspectiveCamera(
     75,
     canvasContainer.offsetWidth / canvasContainer.offsetHeight,
     0.1,
@@ -193,9 +193,16 @@ canvasContainer.addEventListener('mousedown', ({ clientX, clientY }) => {
     mouse.yPrev = clientY;
 });
 
+// Turning the Globe
 addEventListener('mousemove', (event) => {
-    mouse.x = ((event.clientX - innerWidth / 2) / (innerWidth / 2)) * 2 - 1;
-    mouse.y = -(event.clientY / innerHeight) * 2 + 1;
+    if(innerWidth >= 1280) {
+        mouse.x = ((event.clientX - innerWidth / 2) / (innerWidth / 2)) * 2 - 1;
+        mouse.y = -(event.clientY / innerHeight) * 2 + 1;
+    } else {
+        const offset = canvasContainer.getBoundingClientRect().top
+        mouse.x = (event.clientX / innerWidth) * 2 - 1;
+        mouse.y = -((event.clientY - offset) / innerHeight) * 2 + 1;
+    }
 
     gsap.set(popUpEl, {
         x: event.clientX,
@@ -223,5 +230,57 @@ addEventListener('mousemove', (event) => {
 
 
 addEventListener('mouseup', (event) => {
+    mouse.down = false;
+});
+
+addEventListener('resize', () => {
+    renderer.setSize(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
+    camera = new THREE.PerspectiveCamera(
+        75,
+        canvasContainer.offsetWidth / canvasContainer.offsetHeight,
+        0.1,
+        1000
+    );
+    camera.position.z = 15;
+});
+
+addEventListener('touchmove', (event) => {
+    event.clientX = event.touches[0].clientX;
+    event.clientY = event.touches[0].clientY;
+
+    const doesIntersect = raycaster.intersectObject(sphere);
+
+    if(doesIntersect.length > 0) mouse.down = true;
+
+    if(mouse.down) {
+        const offset = canvasContainer.getBoundingClientRect().top
+        mouse.x = (event.clientX / innerWidth) * 2 - 1;
+        mouse.y = -((event.clientY - offset) / innerHeight) * 2 + 1;
+
+        gsap.set(popUpEl, {
+            x: event.clientX,
+            y: event.clientY
+        })
+
+        event.preventDefault();
+        const deltaX = event.clientX - mouse.xPrev;
+        const deltaY = event.clientY - mouse.yPrev;
+
+        group.rotation.offset.x += deltaY * 0.005;
+        group.rotation.offset.y += deltaX * 0.005;
+
+        gsap.to(group.rotation, {
+            y: group.rotation.offset.y,
+            x: group.rotation.offset.x,
+            duration: 2
+        })
+
+        mouse.xPrev = event.clientX;
+        mouse.yPrev = event.clientY;
+    }
+}, { passive: false });
+
+
+addEventListener('touchend', (event) => {
     mouse.down = false;
 });
