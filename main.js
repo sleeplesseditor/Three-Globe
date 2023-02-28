@@ -76,46 +76,6 @@ scene.add(stars);
 
 camera.position.z = 15;
 
-function createBox({lat, lng, country, population}) {
-    const box = new THREE.Mesh(
-        new THREE.BoxGeometry(0.2, 0.2, 0.8), 
-        new THREE.MeshBasicMaterial({
-            color: '#3BF7FF',
-            opacity: 0.4,
-            transparent: true
-        })
-    );
-    
-    const latitude = (lat / 180) * Math.PI;
-    const longitude = (lng / 180) * Math.PI;
-    const radius = 5;
-    
-    const x = radius * Math.cos(latitude) * Math.sin(longitude);
-    const y = radius * Math.sin(latitude);
-    const z = radius * Math.cos(latitude) * Math.cos(longitude);
-    
-    box.position.x = x;
-    box.position.y = y;
-    box.position.z = z;
-
-    box.lookAt(0, 0, 0);
-    box.geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0, -0.4));
-    
-    group.add(box)
-
-    gsap.to(box.scale, {
-        z: 1.4,
-        duration: 2,
-        yoyo: true,
-        repeat: -1,
-        ease: 'linear',
-        delay: Math.random()
-    })
-
-    box.country = country;
-    box.population = population;
-}
-
 function createBoxes(countries) {
     countries.forEach((country) => {
         const scale = country.population / 1000000000;
@@ -171,9 +131,17 @@ createBoxes(countries)
 
 sphere.rotation.y = -Math.PI / 2;
 
+group.rotation.offset = {
+    x: 0,
+    y: 0
+}
+
 const mouse = {
     x: undefined,
-    y: undefined
+    y: undefined,
+    down: false,
+    xPrev: undefined,
+    yPrev: undefined
 };
 
 const raycaster = new THREE.Raycaster();
@@ -184,15 +152,6 @@ const populationValueEl = document.querySelector('#populationValueEl')
 function animate() {
     requestAnimationFrame(animate)
     renderer.render(scene, camera);
-    // group.rotation.y += 0.002;
-
-    // if(mouse.x) {
-    //     gsap.to(group.rotation, {
-    //         x: -mouse.y * 1.8, 
-    //         y: mouse.x * 1.8,
-    //         duration: 2
-    //     })
-    // }
 
     // update the picking ray with the camera and pointer position
 	raycaster.setFromCamera(mouse, camera);
@@ -228,6 +187,12 @@ function animate() {
 
 animate();
 
+canvasContainer.addEventListener('mousedown', ({ clientX, clientY }) => {
+    mouse.down = true;
+    mouse.xPrev = clientX;
+    mouse.yPrev = clientY;
+});
+
 addEventListener('mousemove', (event) => {
     mouse.x = ((event.clientX - innerWidth / 2) / (innerWidth / 2)) * 2 - 1;
     mouse.y = -(event.clientY / innerHeight) * 2 + 1;
@@ -236,4 +201,27 @@ addEventListener('mousemove', (event) => {
         x: event.clientX,
         y: event.clientY
     })
+
+    if(mouse.down) {
+        event.preventDefault();
+        const deltaX = event.clientX - mouse.xPrev;
+        const deltaY = event.clientY - mouse.yPrev;
+
+        group.rotation.offset.x += deltaY * 0.005;
+        group.rotation.offset.y += deltaX * 0.005;
+
+        gsap.to(group.rotation, {
+            y: group.rotation.offset.y,
+            x: group.rotation.offset.x,
+            duration: 2
+        })
+
+        mouse.xPrev = event.clientX;
+        mouse.yPrev = event.clientY;
+    }
+});
+
+
+addEventListener('mouseup', (event) => {
+    mouse.down = false;
 });
