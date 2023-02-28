@@ -1,3 +1,4 @@
+import './tailwind.css';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import vertexShader from './shaders/vertex.glsl';
@@ -5,20 +6,21 @@ import fragmentShader from './shaders/fragment.glsl';
 import atmosphereVertexShader from './shaders/atmosphereVertex.glsl';
 import atmosphereFragmentShader from './shaders/atmosphereFragment.glsl';
 
+const canvasContainer = document.querySelector('#canvasContainer')
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
     75,
-    innerWidth / innerHeight,
+    canvasContainer.offsetWidth / canvasContainer.offsetHeight,
     0.1,
     1000
 );
 
 const renderer = new THREE.WebGLRenderer({
-    antialias: true
+    antialias: true,
+    canvas: document.querySelector('canvas')
 });
-renderer.setSize(innerWidth, innerHeight);
+renderer.setSize(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
-document.body.appendChild(renderer.domElement);
 
 // Creation of Earth sphere
 const sphere = new THREE.Mesh(
