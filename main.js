@@ -1,5 +1,6 @@
 import './tailwind.css';
 import * as THREE from 'three';
+import countries from './countries.json';
 import gsap from 'gsap';
 import vertexShader from './shaders/vertex.glsl';
 import fragmentShader from './shaders/fragment.glsl';
@@ -115,7 +116,58 @@ function createBox({lat, lng, country, population}) {
     box.population = population;
 }
 
-createBox({lat: 23.6345, lng: -102.5528, country: 'Mexico', population: '127.6 million' });
+function createBoxes(countries) {
+    countries.forEach((country) => {
+        const scale = country.population / 1000000000;
+        const lat = country.latlng[0];
+        const lng = country.latlng[1];
+        const zScale = 0.8 * scale;
+
+        const box = new THREE.Mesh(
+            new THREE.BoxGeometry(
+                Math.max(0.1, 0.2 * scale), 
+                Math.max(0.1, 0.2 * scale), 
+                Math.max(zScale, 0.4 * Math.random())
+            ), 
+            new THREE.MeshBasicMaterial({
+                color: '#3BF7FF',
+                opacity: 0.4,
+                transparent: true
+            })
+        );
+        
+        const latitude = (lat / 180) * Math.PI;
+        const longitude = (lng / 180) * Math.PI;
+        const radius = 5;
+        
+        const x = radius * Math.cos(latitude) * Math.sin(longitude);
+        const y = radius * Math.sin(latitude);
+        const z = radius * Math.cos(latitude) * Math.cos(longitude);
+        
+        box.position.x = x;
+        box.position.y = y;
+        box.position.z = z;
+    
+        box.lookAt(0, 0, 0);
+        box.geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0, -zScale / 2));
+        
+        group.add(box)
+    
+        gsap.to(box.scale, {
+            z: 1.4,
+            duration: 2,
+            yoyo: true,
+            repeat: -1,
+            ease: 'linear',
+            delay: Math.random()
+        })
+    
+        box.country = country.name;
+        box.population = new Intl.NumberFormat().format(country.population);
+    });
+}
+
+createBoxes(countries)
 
 sphere.rotation.y = -Math.PI / 2;
 
@@ -132,7 +184,7 @@ const populationValueEl = document.querySelector('#populationValueEl')
 function animate() {
     requestAnimationFrame(animate)
     renderer.render(scene, camera);
-    group.rotation.y += 0.002;
+    // group.rotation.y += 0.002;
 
     // if(mouse.x) {
     //     gsap.to(group.rotation, {
