@@ -7,6 +7,9 @@
     width: 70vw;
     height: 560px;
 
+    opacity: 0;
+    transition: opacity 0.2s ease-in;
+
     &__close {
         position: absolute;
         top: 5px;
@@ -137,4 +140,14 @@
             margin-left: 20px;
         }
     }
+}
+
+.countries-dialog[open] {
+    opacity: 1;
+}
+
+@starting-style {
+  .countries-dialog[open] {
+    opacity: 0;
+  }
 }
