@@ -1,53 +1,13 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@1,700&family=Lato&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      body {
-        margin: 0;
-        -webkit-font-smoothing: antialiased;
-      }
-
-      .font-exo {
-        font-family: 'Exo 2', sans-serif;
-      }
-
-      .font-lato {
-        font-family: 'Lato', sans-serif;
-      }
-    </style>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Three 3D Globe</title>
+    <title>Three Globe React</title>
   </head>
   <body>
-    <div id="popUpEl" class="bg-black bg-opacity-75 fixed px-4 py-2 rounded-lg">
-      <h2 class="text-white text-xs">
-        <span id="populationEl"></span>
-        <span>Population</span>
-      </h2>
-      <p id="populationValueEl" class="text-white font-bold text-lg">300</p>
-    </div>
-    <div class="xl:flex h-screen bg-black">
-      <div class="xl:w-1/2 flex flex-col justify-center px-8 pt-16 xl:pt-0">
-        <div style="max-width:500px" class="mx-auto">
-          <h1 class="text-white text-4xl mb-8 font-exo leading-none">WORKING WITH SHADERS IN THREE.JS</h1>
-          <p class="text-gray-400 mb-8 font-lato">
-            Click and drag the globe to see the populations of nations around the world
-          </p>
-          <div>
-            <a href="" class="text-white bg-green-600 inline-block px-8 py-4 rounded-full font-lato">Learn More</a>
-          </div>
-        </div>
-      </div>
-      <div class="h-screen xl:w-1/2" id="canvasContainer">
-        <canvas></canvas>
-      </div>
-    </div>
-    <script type="module" src="/main.js"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
