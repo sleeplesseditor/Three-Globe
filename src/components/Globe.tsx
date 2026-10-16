@@ -14,9 +14,14 @@ interface Country {
     latlng: number[];
 }
 
+interface IGlobeProps {
+    onCountrySelect: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
 const countryData = countries as Country[];
 
-const Globe = () => {
+const Globe = ({ onCountrySelect }: IGlobeProps) => {
+
     const canvasContainer = React.useRef<HTMLDivElement>(null);
     const canvasRef = React.useRef<HTMLCanvasElement>(null);
     const popupRef = React.useRef<HTMLDivElement>(null);
@@ -283,8 +288,8 @@ const Globe = () => {
                     transform: 'translate(12px, 12px)'
                 }}
             >
-                <div><span ref={countryNameRef} /> population</div>
-                <strong ref={populationRef} />
+                <div><span ref={countryNameRef} /></div>
+                <span>Population: <strong ref={populationRef} /></span>
             </div>
         </div>
     );
