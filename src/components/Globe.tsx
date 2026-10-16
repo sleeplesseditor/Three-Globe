@@ -9,13 +9,14 @@ import atmosphereVertexShader from '@shaders/atmosphereVertex.glsl?raw';
 import atmosphereFragmentShader from '@shaders/atmosphereFragment.glsl?raw';
 
 interface Country {
+    alpha3Code: string;
     name: string;
     population: number;
     latlng: number[];
 }
 
 interface IGlobeProps {
-    onCountrySelect: React.Dispatch<React.SetStateAction<string | null>>;
+    onCountrySelect: (country: string) => void;
 }
 
 const countryData = countries as Country[];
@@ -137,6 +138,7 @@ const Globe = ({ onCountrySelect }: IGlobeProps) => {
             box.lookAt(0, 0, 0);
             box.geometry.translate(0, 0, -depth / 2);
             box.userData.country = country.name;
+            box.userData.alpha3Code = country.alpha3Code;
             box.userData.population = new Intl.NumberFormat().format(country.population);
             group.add(box);
             markers.push(box);
@@ -172,6 +174,7 @@ const Globe = ({ onCountrySelect }: IGlobeProps) => {
         let pointerDown = false;
         let pointerInside = false;
         let previousPointer = { x: 0, y: 0 };
+        let pointerDownPosition = { x: 0, y: 0 };
         let animationFrame = 0;
 
         const updatePointer = (event: PointerEvent) => {
@@ -198,11 +201,48 @@ const Globe = ({ onCountrySelect }: IGlobeProps) => {
         const handlePointerDown = (event: PointerEvent) => {
             pointerDown = true;
             previousPointer = { x: event.clientX, y: event.clientY };
+            pointerDownPosition = { x: event.clientX, y: event.clientY };
             canvas.setPointerCapture(event.pointerId);
         };
 
-        const handlePointerUp = () => {
+        const findVisibleMarker = () => {
+            if (!pointerInside) return undefined;
+
+            raycaster.setFromCamera(pointer, camera);
+            const markerIntersection = raycaster.intersectObjects(markers)[0];
+            const globeIntersection = raycaster.intersectObject(sphere)[0];
+
+            if (!markerIntersection || (
+                globeIntersection && markerIntersection.distance >= globeIntersection.distance
+            )) {
+                return undefined;
+            }
+
+            return markerIntersection.object as typeof markers[number];
+        };
+
+        const handlePointerUp = (event: PointerEvent) => {
+            if (!pointerDown) return;
+
+            const movementX = event.clientX - pointerDownPosition.x;
+            const movementY = event.clientY - pointerDownPosition.y;
+            const wasClick = movementX ** 2 + movementY ** 2 <= 36;
             pointerDown = false;
+
+            if (!wasClick) return;
+
+            const bounds = container.getBoundingClientRect();
+            pointerInside = event.clientX >= bounds.left
+                && event.clientX <= bounds.right
+                && event.clientY >= bounds.top
+                && event.clientY <= bounds.bottom;
+            pointer.x = ((event.clientX - bounds.left) / bounds.width) * 2 - 1;
+            pointer.y = -((event.clientY - bounds.top) / bounds.height) * 2 + 1;
+
+            const clickedMarker = findVisibleMarker();
+            if (clickedMarker) {
+                onCountrySelect(clickedMarker.userData.country as string);
+            }
         };
 
         const animate = () => {
@@ -210,18 +250,11 @@ const Globe = ({ onCountrySelect }: IGlobeProps) => {
             group.rotation.x += (targetRotation.x - group.rotation.x) * 0.08;
             group.rotation.y += (targetRotation.y - group.rotation.y) * 0.08;
 
-            raycaster.setFromCamera(pointer, camera);
-            const intersections = pointerInside ? raycaster.intersectObjects(markers) : [];
-            const globeIntersection = pointerInside ? raycaster.intersectObject(sphere)[0] : undefined;
             markers.forEach((marker) => {
                 marker.material.opacity = 0.4;
             });
 
-            const markerIntersection = intersections[0];
-            const hoveredMarker = markerIntersection
-                && (!globeIntersection || markerIntersection.distance < globeIntersection.distance)
-                ? markerIntersection.object as typeof markers[number]
-                : undefined;
+            const hoveredMarker = findVisibleMarker();
             if (hoveredMarker) {
                 hoveredMarker.material.opacity = 1;
                 countryName.textContent = hoveredMarker.userData.country;

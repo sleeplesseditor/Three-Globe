@@ -1,8 +1,12 @@
+const apiKey = import.meta.env.VITE_COUNTRIES_API_KEY;
+
 export const searchCountries = async (countryName: string) => {
-    const response = await fetch(`https://api.restcountries.com/countries/v5?q=${countryName}`,
-        { headers: { 
-            'Authorization': `Bearer ${import.meta.env.COUNTRIES_API_KEY}`
-        }}
+    const response = await fetch(`https://api.restcountries.com/countries/v5?q=${encodeURIComponent(countryName)}`,
+        {
+            headers: {
+            Authorization: `Bearer ${apiKey}`,
+            },
+        }
     );
     
     if (!response.ok) {
