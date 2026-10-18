@@ -1,5 +1,9 @@
 const apiKey = import.meta.env.VITE_COUNTRIES_API_KEY;
 
+if (!apiKey) {
+    throw new Error('VITE_COUNTRIES_API_KEY is not configured.');
+}
+
 export const searchCountries = async (countryName: string) => {
     const response = await fetch(`https://api.restcountries.com/countries/v5?q=${encodeURIComponent(countryName)}`,
         {
