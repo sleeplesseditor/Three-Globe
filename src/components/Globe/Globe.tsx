@@ -7,6 +7,7 @@ import vertexShader from '@shaders/vertex.glsl?raw';
 import fragmentShader from '@shaders/fragment.glsl?raw';
 import atmosphereVertexShader from '@shaders/atmosphereVertex.glsl?raw';
 import atmosphereFragmentShader from '@shaders/atmosphereFragment.glsl?raw';
+import './Globe.scss';
 
 interface Country {
     alpha3Code: string;
@@ -27,16 +28,14 @@ const Globe = ({ onCountrySelect }: IGlobeProps) => {
     const canvasRef = React.useRef<HTMLCanvasElement>(null);
     const popupRef = React.useRef<HTMLDivElement>(null);
     const countryNameRef = React.useRef<HTMLSpanElement>(null);
-    const populationRef = React.useRef<HTMLSpanElement>(null);
 
     React.useEffect(() => {
         const container = canvasContainer.current;
         const canvas = canvasRef.current;
         const popup = popupRef.current;
         const countryName = countryNameRef.current;
-        const population = populationRef.current;
 
-        if (!container || !canvas || !popup || !countryName || !population) {
+        if (!container || !canvas || !popup || !countryName) {
             return;
         }
 
@@ -139,7 +138,6 @@ const Globe = ({ onCountrySelect }: IGlobeProps) => {
             box.geometry.translate(0, 0, -depth / 2);
             box.userData.country = country.name;
             box.userData.alpha3Code = country.alpha3Code;
-            box.userData.population = new Intl.NumberFormat().format(country.population);
             group.add(box);
             markers.push(box);
 
@@ -245,6 +243,17 @@ const Globe = ({ onCountrySelect }: IGlobeProps) => {
             }
         };
 
+        const handleWheel = (event: WheelEvent) => {
+            event.preventDefault();
+
+            camera.position.z = THREE.MathUtils.clamp(
+                camera.position.z * Math.exp(event.deltaY * 0.001),
+                7,
+                30
+            );
+        };
+
+
         const animate = () => {
             animationFrame = requestAnimationFrame(animate);
             group.rotation.x += (targetRotation.x - group.rotation.x) * 0.08;
@@ -258,7 +267,6 @@ const Globe = ({ onCountrySelect }: IGlobeProps) => {
             if (hoveredMarker) {
                 hoveredMarker.material.opacity = 1;
                 countryName.textContent = hoveredMarker.userData.country;
-                population.textContent = hoveredMarker.userData.population;
                 popup.style.display = 'block';
             } else {
                 popup.style.display = 'none';
@@ -270,6 +278,7 @@ const Globe = ({ onCountrySelect }: IGlobeProps) => {
         canvas.addEventListener('pointerdown', handlePointerDown);
         container.addEventListener('pointermove', updatePointer);
         container.addEventListener('pointerleave', handlePointerLeave);
+        container.addEventListener('wheel', handleWheel, { passive: false });
         window.addEventListener('pointerup', handlePointerUp);
         window.addEventListener('pointercancel', handlePointerUp);
         animate();
@@ -280,6 +289,7 @@ const Globe = ({ onCountrySelect }: IGlobeProps) => {
             canvas.removeEventListener('pointerdown', handlePointerDown);
             container.removeEventListener('pointermove', updatePointer);
             container.removeEventListener('pointerleave', handlePointerLeave);
+            container.removeEventListener('wheel', handleWheel);
             window.removeEventListener('pointerup', handlePointerUp);
             window.removeEventListener('pointercancel', handlePointerUp);
             markerTweens.forEach((tween) => tween.kill());
@@ -321,8 +331,8 @@ const Globe = ({ onCountrySelect }: IGlobeProps) => {
                     transform: 'translate(12px, 12px)'
                 }}
             >
-                <div><span ref={countryNameRef} /></div>
-                <span>Population: <strong ref={populationRef} /></span>
+                <div><span className="tooltip-content" ref={countryNameRef} /></div>
+                <span>Click to learn more</span>
             </div>
         </div>
     );

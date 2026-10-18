@@ -14,5 +14,6 @@ export const searchCountries = async (countryName: string) => {
     }
     
     const data = await response.json();
-    return data;
+    const filteredData = await data.data.objects.filter((item: any) => item.names.common === countryName);
+    return filteredData[0];
 }

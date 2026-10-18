@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { searchCountries } from '@api/countries';
 import { useQuery } from '@tanstack/react-query';
+import { SyncLoader } from 'react-spinners';
 import './CountriesDialog.scss';
 
 interface DialogProps {
@@ -16,6 +17,8 @@ const CountriesDialog = ({ onClose, selectedCountry }: DialogProps) => {
         queryFn: () => searchCountries(selectedCountry),
         enabled: !!selectedCountry
     });
+
+    console.log('DAT', data)
 
     React.useEffect(() => {
         const dialog = dialogRef.current;
@@ -39,10 +42,14 @@ const CountriesDialog = ({ onClose, selectedCountry }: DialogProps) => {
             </button>
             <span className="countries-dialog__header">
                 {(!isLoading && data ) ? <h2>{selectedCountry}</h2> : null}
-                {(!isLoading && data ) ? <img className="countries-dialog__flag" src={data?.data.objects?.[0].flag.url_svg} alt="" /> : null}
+                {(!isLoading && data ) ? <img className="countries-dialog__flag" src={data?.flag.url_svg} alt="" /> : null}
             </span>
             {isLoading && (
                 <div className="countries-dialog__loading-message">
+                    <SyncLoader 
+                        color="#ffffff"
+                        size={20}
+                    />
                     <p>Loading country details...</p>
                 </div>
             )}
@@ -55,14 +62,14 @@ const CountriesDialog = ({ onClose, selectedCountry }: DialogProps) => {
                 <div className="countries-dialog__section--container">
                     <div className="countries-dialog__section">
                         <h6></h6>
-                        {data.data.objects?.[0].capitals.map((city: any) => {
+                        {data.capitals.map((city: any) => {
                             return <span key={city.name}>
                                 <strong>Capital:</strong> {city.name}
                             </span>
                         })}
-                        <span><strong>Area (miles): </strong>{`${data.data.objects?.[0].area.miles.toLocaleString()}`}</span>
-                        <span><strong>Area (kilometres): </strong>{`${data.data.objects?.[0].area.kilometers.toLocaleString()}`}</span>
-                        <span><strong>Population: </strong>{`${data.data.objects?.[0].population.toLocaleString()}`}</span>
+                        <span><strong>Area (miles): </strong>{`${data.area.miles.toLocaleString()}`}</span>
+                        <span><strong>Area (kilometres): </strong>{`${data.area.kilometers.toLocaleString()}`}</span>
+                        <span><strong>Population: </strong>{`${data.population.toLocaleString()}`}</span>
                     </div>
                     <div className="countries-dialog__grid">
                         <div className="countries-dialog__section">
@@ -70,21 +77,21 @@ const CountriesDialog = ({ onClose, selectedCountry }: DialogProps) => {
                             <hr />
                             <strong>Currencies:</strong>
                             <ul>
-                                {data.data.objects?.[0].currencies.map((currency: any) => {
+                                {data.currencies.map((currency: any) => {
                                     return (
                                         <li key={currency.name}>{currency.name} ({currency.symbol})</li>
                                     )
                                 })}
                             </ul>
-                            {Object.keys(data.data.objects?.[0].economy.gini_coefficient).length > 0 ? (
+                            {Object.keys(data.economy.gini_coefficient).length > 0 ? (
                                 <div className="countries-dialog__gini-container">
                                     <strong>Gini Coefficient:</strong>
                                     <div className="countries-dialog__gini-elements">
-                                        {Object.keys(data.data.objects?.[0].economy.gini_coefficient).map((item) => {
+                                        {Object.keys(data.economy.gini_coefficient).map((item) => {
                                             return (
                                                 <div className="countries-dialog__gini-item" key={item}>
                                                     <span className="countries-dialog__gini-item-year">{item}</span>
-                                                    <span className="countries-dialog__gini-item-value">{data.data.objects?.[0].economy.gini_coefficient[item]}</span>
+                                                    <span className="countries-dialog__gini-item-value">{data.economy.gini_coefficient[item]}</span>
                                                 </div>
                                             )
                                         })}
@@ -96,12 +103,12 @@ const CountriesDialog = ({ onClose, selectedCountry }: DialogProps) => {
                             <h6>Political</h6>
                             <hr />
                             <span>
-                                <strong>Government:</strong> {data.data.objects?.[0].government_type}
+                                <strong>Government Type:</strong> {data.government_type}
                             </span>
                             <span>
                                 <strong>Languages:</strong>
                                 <ul>
-                                    {data.data.objects?.[0].languages.map((language: any) => {
+                                    {data.languages.map((language: any) => {
                                     return (
                                         <li key={language.name}>{language.name}</li>
                                     )
@@ -115,14 +122,14 @@ const CountriesDialog = ({ onClose, selectedCountry }: DialogProps) => {
                             <span>
                                 <strong>Units:</strong>
                                 <ul>
-                                    <li><strong>Measurements: </strong>{data.data.objects?.[0].units.measurement_system}</li>
-                                    <li><strong>Temperature: </strong>{data.data.objects?.[0].units.temperature_scale}</li>
+                                    <li><strong>Measurements: </strong>{data.units.measurement_system}</li>
+                                    <li><strong>Temperature: </strong>{data.units.temperature_scale}</li>
                                 </ul>
                             </span>
                         </div>
                     </div>
                     <div className="countries-dialog__section">
-                        <p className="countries-dialog__description">{data.data.objects?.[0].descriptions.long}</p>
+                        <p className="countries-dialog__description">{data.descriptions.long}</p>
                     </div>
                 </div>
             )}
