@@ -244,6 +244,13 @@ const Globe = ({ onCountrySelect }: IGlobeProps) => {
         };
 
         const handleWheel = (event: WheelEvent) => {
+            const bounds = container.getBoundingClientRect();
+            pointer.x = ((event.clientX - bounds.left) / bounds.width) * 2 - 1;
+            pointer.y = -((event.clientY - bounds.top) / bounds.height) * 2 + 1;
+            raycaster.setFromCamera(pointer, camera);
+
+            if (raycaster.intersectObject(sphere).length === 0) return;
+
             event.preventDefault();
 
             camera.position.z = THREE.MathUtils.clamp(
@@ -261,13 +268,14 @@ const Globe = ({ onCountrySelect }: IGlobeProps) => {
 
             markers.forEach((marker) => {
                 marker.material.opacity = 0.4;
+                // marker.style.cursor = 'pointer';
             });
 
             const hoveredMarker = findVisibleMarker();
             if (hoveredMarker) {
                 hoveredMarker.material.opacity = 1;
                 countryName.textContent = hoveredMarker.userData.country;
-                popup.style.display = 'block';
+                popup.style.display = 'flex';
             } else {
                 popup.style.display = 'none';
             }
@@ -319,20 +327,11 @@ const Globe = ({ onCountrySelect }: IGlobeProps) => {
                 style={{ display: 'block', width: '100%', height: '100%', touchAction: 'none' }}
             />
             <div
+                className="tooltip"
                 ref={popupRef}
-                style={{
-                    display: 'none',
-                    position: 'absolute',
-                    pointerEvents: 'none',
-                    background: 'rgba(0, 0, 0, 0.75)',
-                    color: 'white',
-                    padding: '0.5rem 1rem',
-                    borderRadius: '0.5rem',
-                    transform: 'translate(12px, 12px)'
-                }}
             >
-                <div><span className="tooltip-content" ref={countryNameRef} /></div>
-                <span>Click to learn more</span>
+                <span className="tooltip-content" ref={countryNameRef} />
+                <span className="tooltip-text">Click to learn more</span>
             </div>
         </div>
     );

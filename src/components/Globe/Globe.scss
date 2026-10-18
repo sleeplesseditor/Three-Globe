@@ -1,5 +1,20 @@
 .tooltip {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    pointer-events: none;
+    background: rgba(0, 0, 0, 0.75);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    transform: translate(12px, 12px);
+    min-width: 200px;
+
     &-content {
-        
+        font-weight: 700;
+    }
+
+    &-text {
+        font-weight: 300;
     }
 }

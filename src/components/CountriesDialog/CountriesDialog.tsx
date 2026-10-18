@@ -18,8 +18,6 @@ const CountriesDialog = ({ onClose, selectedCountry }: DialogProps) => {
         enabled: !!selectedCountry
     });
 
-    console.log('DAT', data)
-
     React.useEffect(() => {
         const dialog = dialogRef.current;
         if (!dialog) return;
@@ -43,6 +41,9 @@ const CountriesDialog = ({ onClose, selectedCountry }: DialogProps) => {
             <span className="countries-dialog__header">
                 {(!isLoading && data ) ? <h2>{selectedCountry}</h2> : null}
                 {(!isLoading && data ) ? <img className="countries-dialog__flag" src={data?.flag.url_svg} alt="" /> : null}
+            </span>
+            <span className="countries-dialog__subheader">
+                <h6>{(!isLoading && data) ? data?.names.official : null} </h6>
             </span>
             {isLoading && (
                 <div className="countries-dialog__loading-message">

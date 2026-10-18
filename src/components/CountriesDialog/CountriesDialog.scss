@@ -4,8 +4,8 @@
     padding: 10px;
     border-radius: 5px;
     background-color: rgba(121, 121, 121, 0.4);
-    width: 70vw;
-    height: 560px;
+    width: 55vw;
+    height: 575px;
     top: 5%;
     left: 3%;
 
@@ -87,7 +87,7 @@
         @include flex-layout(row, center, center);
 
         gap: 10px;
-        margin-bottom: 10px;
+        margin-bottom: 5px;
 
         h2 {
             font-weight: 700;
@@ -145,6 +145,15 @@
 
         li {
             margin-left: 20px;
+            font-size: 16px;
+        }
+    }
+
+    &__subheader {
+        h6 {
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 5px;
         }
     }
 }

@@ -11,14 +11,11 @@ function App() {
     <div className="app-container">
       <div className="xl:flex h-screen bg-black">
         <div className="xl:w-1/2 flex flex-col justify-center px-8 pt-16 xl:pt-0">
-          <div style={{ maxWidth:500 }} className="mx-auto">
+          <div style={{ maxWidth:500 }} className="mx-auto text-content">
             <h1 className="text-white text-4xl mb-8 font-exo leading-none">THREE.JS GLOBE</h1>
             <p className="text-gray-400 mb-8 font-lato">
-              Click a marker to see learn more about that country, or drag the globe to rotate it.
+              Click a marker to learn more about that country, or drag the globe to rotate it.
             </p>
-            {/* <div>
-              <a href="" className="text-white bg-green-600 inline-block px-8 py-4 rounded-full font-lato">Learn More</a>
-            </div> */}
           </div>
         </div>
         {selectedCountry && (
