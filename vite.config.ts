@@ -12,7 +12,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
   },
-  "base": "/",
+  "base": "/Three-Globe/",
   resolve: {
     alias: {
       "@api": path.resolve(__dirname, "./src/api"),
