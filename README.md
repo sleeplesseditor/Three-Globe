@@ -7,7 +7,7 @@
 - [Running the App Locally](#running-the-app-locally)
 
 ## Description
-A 3D globe displaying global population data, originally built as part of the coursework for a [Udemy course on using shaders with Three.js](https://www.udemy.com/course/intermediate-threejs-with-shaders). The 3D globe displays national population sizes represented by prisms, with further information provided in a dialog when the user clicks on a prism.
+A 3D globe displaying data about different countries (i.e. population size, economy, political systems), originally built as part of the coursework for a [Udemy course on using shaders with Three.js](https://www.udemy.com/course/intermediate-threejs-with-shaders). The 3D globe displays national population sizes represented by prisms, with further information provided in a dialog when the user clicks on a prism.
 
 The app is live and available to use [here](https://sleeplesseditor.github.io/Three-Globe/).
 
